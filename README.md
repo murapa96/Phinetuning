@@ -1,64 +1,171 @@
 # Phinetuning
 
-A test repository to finetune phi2 models.
+Advanced finetuning toolkit for Phi-2 and other language models, featuring distributed training, hyperparameter optimization, and mixed precision training.
 
 ## Table of Contents
 
-- [Introduction](#introduction)
+- [Features](#features)
 - [Installation](#installation)
 - [Usage](#usage)
+  - [Training](#training)
+  - [Generation](#generation)
+- [Advanced Configuration](#advanced-configuration)
 - [Examples](#examples)
 - [Contributing](#contributing)
 - [License](#license)
 
-## Introduction
+## Features
 
-This repository is dedicated to the finetuning of phi2 models using Python. The primary goal is to test and improve the performance of these models through various experiments and adjustments.
+- Distributed training support
+- Mixed precision training (FP16/BF16)
+- 4-bit and 8-bit quantization
+- Hyperparameter optimization using Optuna
+- Data augmentation techniques
+- Advanced text generation with various decoding strategies
+- Streaming generation support
+- Comprehensive logging and error handling
+- Support for multiple model architectures
 
 ## Installation
-
-To get started, clone the repository and install the necessary dependencies:
 
 ```bash
 git clone https://github.com/murapa96/Phinetuning.git
 cd Phinetuning
 pip install -r requirements.txt
 ```
-
 ## Usage
 
-To run the finetuning process, use the following command:
+### Training
+
+Basic training command:
 
 ```bash
-python finetune.py --config config.yaml
+python train.py \
+  --model_path microsoft/phi-2 \
+  --dataset_path your_dataset.json \
+  --output_dir ./results \
+  --batch_size 1 \
+  --grad_accum_steps 4
 ```
 
-Make sure to update the `config.yaml` file with your specific parameters and settings.
+Enable advanced features:
+
+```bash
+python train.py \
+  --model_path microsoft/phi-2 \
+  --dataset_path your_dataset.json \
+  --output_dir ./results \
+  --mixed_precision bf16 \
+  --load_in_4bit \
+  --distributed \
+  --tune_hyperparams \
+  --n_trials 10 \
+  --augment_data
+```
+
+### Generation
+
+Basic text generation:
+
+```bash
+python generate.py \
+  --model_path ./results/final_model \
+  --input_text "Your prompt here" \
+  --max_length 200
+```
+
+Advanced generation with sampling:
+
+```bash
+python generate.py \
+  --model_path ./results/final_model \
+  --input_file inputs.json \
+  --output_file outputs.json \
+  --temperature 0.7 \
+  --top_p 0.95 \
+  --top_k 50 \
+  --do_sample \
+  --streaming \
+  --mixed_precision
+```
+
+## Advanced Configuration
+
+### Training Arguments
+
+- `--mixed_precision`: Choose between 'no', 'fp16', or 'bf16'
+- `--load_in_4bit`: Enable 4-bit quantization
+- `--load_in_8bit`: Enable 8-bit quantization
+- `--distributed`: Enable distributed training
+- `--tune_hyperparams`: Enable Optuna hyperparameter tuning
+- `--augment_data`: Enable data augmentation
+- `--max_seq_length`: Maximum sequence length (default: 2048)
+- `--learning_rate`: Learning rate (default: 2e-4)
+- `--batch_size`: Per device batch size
+- `--grad_accum_steps`: Gradient accumulation steps
+
+### Generation Arguments
+
+- `--temperature`: Controls randomness (0.0-1.0)
+- `--top_k`: Top-k sampling parameter
+- `--top_p`: Nucleus sampling parameter
+- `--num_beams`: Number of beams for beam search
+- `--repetition_penalty`: Penalize repeated tokens
+- `--streaming`: Enable token-by-token generation
+- `--mixed_precision`: Enable mixed precision inference
+- `--load_in_4bit`: Enable 4-bit quantization for memory efficiency
 
 ## Examples
 
-Here are some examples of how to use the scripts in this repository:
+1. **Distributed training with mixed precision:**
 
-1. **Finetuning a model:**
-    ```bash
-    python finetune.py --config configs/finetune_example.yaml
-    ```
+```bash
+python train.py \
+  --model_path microsoft/phi-2 \
+  --dataset_path your_dataset.json \
+  --distributed \
+  --mixed_precision bf16 \
+  --batch_size 2 \
+  --grad_accum_steps 4 \
+  --learning_rate 2e-4 \
+  --max_steps 10000
+```
 
-2. **Evaluating a model:**
-    ```bash
-    python evaluate.py --model_path models/finetuned_model.pth --data_path data/test_data.csv
-    ```
+2. **Hyperparameter optimization:**
+
+```bash
+python train.py \
+  --model_path microsoft/phi-2 \
+  --dataset_path your_dataset.json \
+  --tune_hyperparams \
+  --n_trials 20 \
+  --load_in_4bit
+```
+
+3. **Batch generation with advanced sampling:**
+
+```bash
+python generate.py \
+  --model_path ./results/final_model \
+  --input_file inputs.json \
+  --output_file outputs.json \
+  --batch_size 4 \
+  --temperature 0.7 \
+  --top_p 0.95 \
+  --do_sample \
+  --mixed_precision
+```
 
 ## Contributing
 
-We welcome contributions to this project. Please follow these steps to contribute:
+We welcome contributions! Please:
 
-1. Fork the repository.
-2. Create a new branch: `git checkout -b my-feature-branch`.
-3. Make your changes and commit them: `git commit -am 'Add new feature'`.
-4. Push the branch: `git push origin my-feature-branch`.
-5. Create a pull request.
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feature-name`
+3. Commit your changes: `git commit -am 'Add feature'`
+4. Push to the branch: `git push origin feature-name`
+5. Submit a pull request
 
 ## License
 
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
